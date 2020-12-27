@@ -1,47 +1,61 @@
 from socket import *
 from time import sleep
-import multiprocessing
+import threading
 import random
 
-procs = []
-sockets = []
-c_map = {}  # {addr:numberOfHits}
-group1 = {}  # {addr:name}
-group2 = {}  # {addr:name}
 
-
-def clear_data():
+def clear_data(procs, sockets, c_map, group1, group2):
     c_map.clear()
     for sock in sockets:
         sock.close()
-    for process in procs:
-        process.terminate()
     procs.clear()
     group1.clear()
     group2.clear()
+    sockets.clear()
 
 
-def declare_winner():
-    for ent in c_map:
-        print(ent)
+def declare_winner(c_map, group1, group2):
+    g1 = 0
+    g2 = 0
+    for hostName in group1:
+        g1 += c_map[hostName]
+    for hostName in group2:
+        g2 += c_map[hostName]
+    if g1 > g2:
+        print("group 1 wins!")
+    else:
+        print("group 2 wins!")
 
 
-def listen(sock_tcp):
+def listen(sock_tcp, procs, sockets, c_map, kill_acc, kill_all):
     while 1:
-        sock, addr = sock_tcp.accept()
-        x = multiprocessing.Process(target=thread_job, args=(addr, sock))
-        procs.append(x)
-        sockets.append(sock)
-        c_map[addr] = 0
+        if not kill_acc:
+            try:
+                sock, addr = sock_tcp.accept()
+                sock.settimeout(1)
+                clientHostName = addr[0]
+                x = threading.Thread(
+                    target=thread_job, args=(clientHostName, sock, c_map, kill_all))
+                print("client accepted with: ", clientHostName)
+                procs.append(x)
+                sockets.append(sock)
+                c_map[clientHostName] = 0
+            except:
+                continue
 
 
-def thread_job(addr, socket):
-    while 1:
-        msg = socket.recv(1024)
-        c_map[addr] = c_map[addr] + len(msg)
+def thread_job(clientHostName, socket, c_map, kill_all):
+    print("waiting for msgs from: ", clientHostName)
+    while not kill_all:
+        try:
+            msg = socket.recv(1024)
+            print("received msg from: ", clientHostName, "saying: ", msg)
+            c_map[clientHostName] = c_map[clientHostName] + len(msg)
+        except:
+            continue
 
 
-def start_game():
+def start_game(sockets, procs):
     msg = 'Welcome to Keyboard Spamming Battle Royale.\n'
     msg += "Group 1:\n==\n"
     for n in group1.values():
@@ -50,14 +64,20 @@ def start_game():
     for n in group2.values():
         msg += n
     msg += 'Start pressing keys on your keyboard as fast as you can!!'
-
+    encoded = msg.encode()
     for sock in sockets:
-        sock.send(msg.encode())
+        sock.send(encoded)
     for proc in procs:
         proc.start()
+    sleep(10)
 
 
 if __name__ == "__main__":
+    procs = []
+    sockets = []
+    c_map = {}  # {addr:numberOfHits}
+    group1 = {}  # {addr:name}
+    group2 = {}  # {addr:name}
     server_ip = gethostbyname(gethostname())
     SERVER_PORT = 1300
     UDP_DEST_PORT = 13117
@@ -71,30 +91,37 @@ if __name__ == "__main__":
     #sock_udp.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     sock_udp.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
     sock_tcp = socket(AF_INET, SOCK_STREAM)
+    sock_tcp.settimeout(1)
     sock_tcp.bind(('', SERVER_PORT))
     sock_tcp.listen(5)
-
+    print('Server started, listening on IP address', server_ip)
     while 1:
         # accept connections for 10 secs in t_acc thread
-        print('Server started, listening on IP address', server_ip)
-        t_acc = multiprocessing.Process(target=listen, args=(sock_tcp,))
+        kill_acc = False
+        kill_all = False
+        t_acc = threading.Thread(
+            target=listen, args=(sock_tcp, procs, sockets, c_map, kill_acc, kill_all))
         t_acc.start()
         # send broadcast through udp every one sec
         for x in range(10):
             sleep(1)
             sock_udp.sendto(msg, (BROADCAST, UDP_DEST_PORT))
-        t_acc.terminate()
+        kill_acc = True
         # add all names to list
+        print("all procs", procs)
+        print('all sockets', sockets)
         for s in sockets:
             print(s.getpeername(), s.getsockname())
             msg = s.recv(1024)
             if random.randint(1, 2) == 1:
-                group1[s.getpeername()] = msg.decode()
+                group1[s.getpeername()[0]] = msg.decode()
             else:
-                group2[s.getpeername()] = msg.decode()
+                group2[s.getpeername()[0]] = msg.decode()
         # start game for 10 seconds
-        start_game()
+        start_game(sockets, procs)
+        kill_all = True
         # declare winner
-        declare_winner()
+        declare_winner(c_map, group1, group2)
         # clear all previous game data
-        clear_data()
+        clear_data(procs, sockets, c_map, group1, group2)
+        print("Game over, sending out offer requests...")
