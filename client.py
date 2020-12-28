@@ -12,7 +12,6 @@ if __name__ == "__main__":
     # initiate client socket
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-
     while 1:
         try:
             # receive offer, blocking method

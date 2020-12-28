@@ -21,10 +21,16 @@ def declare_winner(c_map, group1, group2):
         g1 += c_map[hostName]
     for hostName in group2:
         g2 += c_map[hostName]
+    print("Game over!\nGroup 1 typed in ", g1,
+          "characters.\nGroup 2 typed in ", g2, "characters.\n")
     if g1 > g2:
-        print("group 1 wins!")
+        print("Group 1 wins!\nCongratulations to the winners:\n==\n")
+        for n in group1.values():
+            print(n, "\n")
     else:
-        print("group 2 wins!")
+        print("Group 2 wins!\nCongratulations to the winners:\n==\n")
+        for n in group2.values():
+            print(n, "\n")
 
 
 def listen(sock_tcp, procs, sockets, c_map, kill_acc, kill_all):
@@ -33,24 +39,24 @@ def listen(sock_tcp, procs, sockets, c_map, kill_acc, kill_all):
             try:
                 sock, addr = sock_tcp.accept()
                 sock.settimeout(1)
-                clientHostName = addr[0]
+                clientId = addr[0] + str(addr[1])
                 x = threading.Thread(
-                    target=thread_job, args=(clientHostName, sock, c_map, kill_all))
-                print("client accepted with: ", clientHostName)
+                    target=thread_job, args=(clientId, sock, c_map, kill_all))
+                print("client accepted with: ", clientId)
                 procs.append(x)
                 sockets.append(sock)
-                c_map[clientHostName] = 0
+                c_map[clientId] = 0
             except:
                 continue
 
 
-def thread_job(clientHostName, socket, c_map, kill_all):
-    print("waiting for msgs from: ", clientHostName)
+def thread_job(clientId, socket, c_map, kill_all):
+    print("waiting for msgs from: ", clientId)
     while not kill_all:
         try:
             msg = socket.recv(1024)
-            print("received msg from: ", clientHostName, "saying: ", msg)
-            c_map[clientHostName] = c_map[clientHostName] + len(msg)
+            print("received msg from: ", clientId, "saying: ", msg)
+            c_map[clientId] = c_map[clientId] + len(msg)
         except:
             continue
 
@@ -111,12 +117,13 @@ if __name__ == "__main__":
         print("all procs", procs)
         print('all sockets', sockets)
         for s in sockets:
-            print(s.getpeername(), s.getsockname())
+            #print(s.getpeername(), s.getsockname())
+            peer = s.getpeername()
             msg = s.recv(1024)
             if random.randint(1, 2) == 1:
-                group1[s.getpeername()[0]] = msg.decode()
+                group1[peer[0]+str(peer[1])] = msg.decode()
             else:
-                group2[s.getpeername()[0]] = msg.decode()
+                group2[peer[0]+str(peer[1])] = msg.decode()
         # start game for 10 seconds
         start_game(sockets, procs)
         kill_all = True
