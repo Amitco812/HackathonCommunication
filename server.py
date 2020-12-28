@@ -42,7 +42,6 @@ def listen(sock_tcp, procs, sockets, c_map, kill_acc, kill_all):
                 clientId = addr[0] + str(addr[1])
                 x = threading.Thread(
                     target=thread_job, args=(clientId, sock, c_map, kill_all))
-                print("client accepted with: ", clientId)
                 procs.append(x)
                 sockets.append(sock)
                 c_map[clientId] = 0
@@ -51,12 +50,10 @@ def listen(sock_tcp, procs, sockets, c_map, kill_acc, kill_all):
 
 
 def thread_job(clientId, socket, c_map, kill_all):
-    print("waiting for msgs from: ", clientId)
     while not kill_all:
         try:
             msg = socket.recv(1024)
             length = len(msg)
-            print("received msg from: ", clientId, "saying: ", msg,"length: ",length)
             if length == 0:
                 break
             c_map[clientId] = c_map[clientId] + len(msg)
@@ -97,7 +94,7 @@ if __name__ == "__main__":
     # convert to byte array
     msg = bytes(msg_bytes)
     sock_udp = socket(AF_INET, SOCK_DGRAM)  # UDP
-    #sock_udp.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    sock_udp.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     sock_udp.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
     sock_tcp = socket(AF_INET, SOCK_STREAM)
     sock_tcp.settimeout(1)
@@ -117,12 +114,10 @@ if __name__ == "__main__":
             sock_udp.sendto(msg, (BROADCAST, UDP_DEST_PORT))
         kill_acc = True
         # add all names to list
-        print("all procs", procs)
-        print('all sockets', sockets)
         for s in sockets:
-            #print(s.getpeername(), s.getsockname())
+            print(s.getpeername(), s.getsockname())
             peer = s.getpeername()
-            msg = s.recv(1024)
+            msg = s.recv(1024)      # if fails, skip client and remove his socket
             if random.randint(1, 2) == 1:
                 group1[peer[0]+str(peer[1])] = msg.decode()
             else:

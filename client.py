@@ -1,7 +1,10 @@
 from socket import *
 import time
 import sys
-#import signal
+import signal
+
+def interrupted(signum, frame):
+    raise Exception("timeout")
 
 if __name__ == "__main__":
     print('Client started, listening for offer requests...')
@@ -12,7 +15,7 @@ if __name__ == "__main__":
     # initiate client socket
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-    #signal.signal(signal.SIGALRM, interrupted)
+    signal.signal(signal.SIGALRM, interrupted)
     while 1:
         try:
             # receive offer, blocking method
@@ -47,9 +50,9 @@ if __name__ == "__main__":
             try:
                 while time.time() < t_end:
                     try:
-                        #signal.alarm(1)
+                        signal.alarm(1)
                         ch = sys.stdin.read(1)
-                        #signal.alarm(0)
+                        signal.alarm(0)
                         clientTcpSocket.send(ch.encode())
                     except:
                         continue
@@ -57,7 +60,6 @@ if __name__ == "__main__":
                 clientTcpSocket.close()
             print("Server disconnected, listening for offer requests...")
         except:
-            print("exception occurred!")
             continue
 
 
