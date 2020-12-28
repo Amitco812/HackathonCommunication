@@ -55,7 +55,10 @@ def thread_job(clientId, socket, c_map, kill_all):
     while not kill_all:
         try:
             msg = socket.recv(1024)
-            print("received msg from: ", clientId, "saying: ", msg)
+            length = len(msg)
+            print("received msg from: ", clientId, "saying: ", msg,"length: ",length)
+            if length == 0:
+                break
             c_map[clientId] = c_map[clientId] + len(msg)
         except:
             continue
