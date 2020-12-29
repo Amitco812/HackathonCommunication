@@ -42,7 +42,7 @@ def listen(sock_tcp, procs, sockets, c_map, kill_acc, kill_all):
                 clientId = addr[0] + str(addr[1])
                 x = threading.Thread(
                     target=thread_job, args=(clientId, sock, c_map, kill_all))
-                procs.append(x)
+                procs[clientId]=x
                 sockets.append(sock)
                 c_map[clientId] = 0
             except:
@@ -73,13 +73,13 @@ def start_game(sockets, procs):
     encoded = msg.encode()
     for sock in sockets:
         sock.send(encoded)
-    for proc in procs:
+    for proc in procs.values():
         proc.start()
     sleep(10)
 
 
 if __name__ == "__main__":
-    procs = []
+    procs = {}
     sockets = []
     c_map = {}  # {addr:numberOfHits}
     group1 = {}  # {addr:name}
@@ -117,11 +117,17 @@ if __name__ == "__main__":
         for s in sockets:
             print(s.getpeername(), s.getsockname())
             peer = s.getpeername()
-            msg = s.recv(1024)      # if fails, skip client and remove his socket
+            clientId = peer[0]+str(peer[1])
+            try:
+                msg = s.recv(1024)      # if fails, skip client and remove his socket
+            except:
+                sockets.remove(s)   #clear user socket
+                del procs[clientId] #clear user process
+                continue            # go read from next user
             if random.randint(1, 2) == 1:
-                group1[peer[0]+str(peer[1])] = msg.decode()
+                group1[clientId] = msg.decode()
             else:
-                group2[peer[0]+str(peer[1])] = msg.decode()
+                group2[clientId] = msg.decode()
         # start game for 10 seconds
         start_game(sockets, procs)
         kill_all = True

@@ -1,10 +1,23 @@
 from socket import *
 import time
-import sys
 import signal
+import sys, tty, termios
+
 
 def interrupted(signum, frame):
     raise Exception("timeout")
+
+
+def getch():
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        ch = sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    print(ch) #just for ui needs...
+    return ch
 
 if __name__ == "__main__":
     print('Client started, listening for offer requests...')
@@ -51,7 +64,7 @@ if __name__ == "__main__":
                 while time.time() < t_end:
                     try:
                         signal.alarm(1)
-                        ch = sys.stdin.read(1)
+                        ch = getch()
                         signal.alarm(0)
                         clientTcpSocket.send(ch.encode())
                     except:
@@ -62,10 +75,3 @@ if __name__ == "__main__":
         except:
             continue
 
-
-"""
-cases:
-client send name while game is on
-client send bytes while game is not on
-client fails to connect
-"""
