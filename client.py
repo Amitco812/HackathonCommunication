@@ -57,6 +57,7 @@ if __name__ == "__main__":
             clientTcpSocket.connect((hostName, suggestedPort))  # handShake
             groupName = 'Hadorbanim\n'
             clientTcpSocket.send(groupName.encode())  # send group name
+            clientTcpSocket.settimeout(10) #set time out for bad servers
             msgOfNames = clientTcpSocket.recv(1024)  # get names of all groups
             print(msgOfNames.decode())  # print the message
             t_end = time.time() + 10

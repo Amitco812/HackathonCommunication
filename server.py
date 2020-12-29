@@ -115,7 +115,6 @@ if __name__ == "__main__":
         kill_acc = True
         # add all names to list
         for s in sockets:
-            print(s.getpeername(), s.getsockname())
             peer = s.getpeername()
             clientId = peer[0]+str(peer[1])
             try:
