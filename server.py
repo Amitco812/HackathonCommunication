@@ -2,7 +2,15 @@ from socket import *
 from time import sleep
 import threading
 import random
+import sys
 
+RED   = "\033[1;31m"  
+BLUE  = "\033[1;34m"
+CYAN  = "\033[1;36m"
+GREEN = "\033[0;32m"
+RESET = "\033[0;0m"
+BOLD    = "\033[;1m"
+REVERSE = "\033[;7m"
 
 def clear_data(procs, sockets, c_map, group1, group2):
     c_map.clear()
@@ -14,6 +22,18 @@ def clear_data(procs, sockets, c_map, group1, group2):
     sockets.clear()
 
 
+def print_mvp(c_map,winning_group):
+    sys.stdout.write(BOLD + BLUE)
+    best = 0
+    mvp = ""
+    for hostName in winning_group:
+        currVal = c_map[hostName]
+        if currVal > best:
+            mvp = winning_group[hostName]
+            best = currVal
+    print("Best Team Played:",mvp,"\n","Smashing",best,"times!\n")
+
+
 def declare_winner(c_map, group1, group2):
     g1 = 0
     g2 = 0
@@ -21,16 +41,19 @@ def declare_winner(c_map, group1, group2):
         g1 += c_map[hostName]
     for hostName in group2:
         g2 += c_map[hostName]
-    print("Game over!\nGroup 1 typed in ", g1,
-          "characters.\nGroup 2 typed in ", g2, "characters.\n")
+    sys.stdout.write(GREEN)
+    print("Game over!\nGroup 1 typed in", g1,
+          "characters.\nGroup 2 typed in", g2, "characters.\n")
     if g1 > g2:
         print("Group 1 wins!\nCongratulations to the winners:\n==\n")
         for n in group1.values():
             print(n, "\n")
+        print_mvp(c_map,group1)
     elif g2 > g1:
         print("Group 2 wins!\nCongratulations to the winners:\n==\n")
         for n in group2.values():
             print(n, "\n")
+        print_mvp(c_map,group2)
     else:
         print("Its a draw! Thanks for participating!")
 
@@ -102,6 +125,7 @@ if __name__ == "__main__":
     sock_tcp.settimeout(1)
     sock_tcp.bind(('', SERVER_PORT))
     sock_tcp.listen(5)
+    sys.stdout.write(CYAN)
     print('Server started, listening on IP address', server_ip)
     while 1:
         # accept connections for 10 secs in t_acc thread
@@ -137,4 +161,5 @@ if __name__ == "__main__":
         declare_winner(c_map, group1, group2)
         # clear all previous game data
         clear_data(procs, sockets, c_map, group1, group2)
+        sys.stdout.write(CYAN)
         print("Game over, sending out offer requests...")

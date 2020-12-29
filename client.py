@@ -3,6 +3,13 @@ import time
 import signal
 import sys, tty, termios
 
+RED   = "\033[1;31m"  
+BLUE  = "\033[1;34m"
+CYAN  = "\033[1;36m"
+GREEN = "\033[0;32m"
+RESET = "\033[0;0m"
+BOLD    = "\033[;1m"
+REVERSE = "\033[;7m"
 
 def interrupted(signum, frame):
     raise Exception("timeout")
@@ -20,6 +27,7 @@ def getch():
     return ch
 
 if __name__ == "__main__":
+    sys.stdout.write(CYAN)
     print('Client started, listening for offer requests...')
     serverPort = 13117
     # open udp socket to listen to broadcasts
@@ -40,14 +48,17 @@ if __name__ == "__main__":
             length = len(offer)
             # message length expected - 4 bytes cookie, 1 byte type, 2 byte port
             if length != 7:
+                sys.stdout.write(RED)
                 print('deprecated message!')
                 continue
             # corrupted cookie
             if offer[0] != 0xfe or offer[1] != 0xed or offer[2] != 0xbe or offer[3] != 0xef:
+                sys.stdout.write(RED)
                 print('error in message cookie, reject message!')
                 continue
             # corrupted type
             if offer[4] != 0x2:
+                sys.stdout.write(RED)
                 print('error in message type!')
                 continue
             # decode suggested port
@@ -62,6 +73,7 @@ if __name__ == "__main__":
             print(msgOfNames.decode())  # print the message
             t_end = time.time() + 10
             try:
+                sys.stdout.write(GREEN)
                 while time.time() < t_end:
                     try:
                         signal.alarm(1)
@@ -72,6 +84,7 @@ if __name__ == "__main__":
                         continue
             finally:
                 clientTcpSocket.close()
+            sys.stdout.write(CYAN)
             print("Server disconnected, listening for offer requests...")
         except:
             continue
