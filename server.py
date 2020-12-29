@@ -27,10 +27,12 @@ def declare_winner(c_map, group1, group2):
         print("Group 1 wins!\nCongratulations to the winners:\n==\n")
         for n in group1.values():
             print(n, "\n")
-    else:
+    elif g2 > g1:
         print("Group 2 wins!\nCongratulations to the winners:\n==\n")
         for n in group2.values():
             print(n, "\n")
+    else:
+        print("Its a draw! Thanks for participating!")
 
 
 def listen(sock_tcp, procs, sockets, c_map, kill_acc, kill_all):
@@ -42,7 +44,7 @@ def listen(sock_tcp, procs, sockets, c_map, kill_acc, kill_all):
                 clientId = addr[0] + str(addr[1])
                 x = threading.Thread(
                     target=thread_job, args=(clientId, sock, c_map, kill_all))
-                procs[clientId]=x
+                procs[clientId] = x
                 sockets.append(sock)
                 c_map[clientId] = 0
             except:
@@ -118,10 +120,11 @@ if __name__ == "__main__":
             peer = s.getpeername()
             clientId = peer[0]+str(peer[1])
             try:
-                msg = s.recv(1024)      # if fails, skip client and remove his socket
+                # if fails, skip client and remove his socket
+                msg = s.recv(1024)
             except:
-                sockets.remove(s)   #clear user socket
-                del procs[clientId] #clear user process
+                sockets.remove(s)  # clear user socket
+                del procs[clientId]  # clear user process
                 continue            # go read from next user
             if random.randint(1, 2) == 1:
                 group1[clientId] = msg.decode()
