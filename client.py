@@ -2,6 +2,7 @@ from socket import *
 import time
 import signal
 import sys, tty, termios
+import struct
 
 RED   = "\033[1;31m"  
 BLUE  = "\033[1;34m"
@@ -41,32 +42,26 @@ if __name__ == "__main__":
         try:
             # receive offer, blocking method
             offer, serverName = clientUdpSocket.recvfrom(1024)
+            cookie,mtype,pnum = struct.unpack('Ibh',offer)
             # message received, open tcp connection
             hostName = serverName[0]
             print('Received offer from,', hostName,
                   'attempting to connect...')
-            length = len(offer)
-            # message length expected - 4 bytes cookie, 1 byte type, 2 byte port
-            if length != 7:
-                sys.stdout.write(RED)
-                print('deprecated message!',offer)
-                continue
             # corrupted cookie
-            if offer[0] != 0xfe or offer[1] != 0xed or offer[2] != 0xbe or offer[3] != 0xef:
+            if cookie != 0xfeedbeef:
                 sys.stdout.write(RED)
                 print('error in message cookie, reject message!')
                 continue
             # corrupted type
-            if offer[4] != 0x2:
+            if mtype != 0x2:
                 sys.stdout.write(RED)
                 print('error in message type!')
                 continue
             # decode suggested port
             sys.stdout.write(CYAN)
-            suggestedPort = int.from_bytes(offer[5:], "big")
             # open tcp connection
             clientTcpSocket = socket(AF_INET, SOCK_STREAM)  # tcp socket
-            clientTcpSocket.connect((hostName, suggestedPort))  # handShake
+            clientTcpSocket.connect((hostName, pnum))  # handShake
             groupName = 'Hadorbanim\n'
             clientTcpSocket.send(groupName.encode())  # send group name
             clientTcpSocket.settimeout(10) #set time out for bad servers
