@@ -62,6 +62,7 @@ if __name__ == "__main__":
                 print('error in message type!')
                 continue
             # decode suggested port
+            sys.stdout.write(CYAN)
             suggestedPort = int.from_bytes(offer[5:], "big")
             # open tcp connection
             clientTcpSocket = socket(AF_INET, SOCK_STREAM)  # tcp socket
