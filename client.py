@@ -49,7 +49,7 @@ if __name__ == "__main__":
             # message length expected - 4 bytes cookie, 1 byte type, 2 byte port
             if length != 7:
                 sys.stdout.write(RED)
-                print('deprecated message!')
+                print('deprecated message!',offer)
                 continue
             # corrupted cookie
             if offer[0] != 0xfe or offer[1] != 0xed or offer[2] != 0xbe or offer[3] != 0xef:
