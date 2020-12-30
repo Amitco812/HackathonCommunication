@@ -5,6 +5,7 @@ import sys
 import tty
 import termios
 import struct
+from scapy.all import *
 
 RED = "\033[1;31m"
 BLUE = "\033[1;34m"
@@ -35,10 +36,11 @@ def getch():
 if __name__ == "__main__":
     sys.stdout.write(CYAN)
     print('Client started, listening for offer requests...')
+    clientIp = get_if_addr(NETWORK)
     serverPort = 13117
     # open udp socket to listen to broadcasts
     clientUdpSocket = socket(AF_INET, SOCK_DGRAM)
-    clientUdpSocket.bind((NETWORK, serverPort))
+    clientUdpSocket.bind((clientIp, serverPort))
     # initiate client socket
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
