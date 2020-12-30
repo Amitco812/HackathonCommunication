@@ -14,7 +14,7 @@ GREEN = "\033[0;32m"
 RESET = "\033[0;0m"
 BOLD = "\033[;1m"
 REVERSE = "\033[;7m"
-NETWORK = 'eth2'
+NETWORK = 'eth1'
 
 
 def clear_data(procs, sockets, c_map, group1, group2):
@@ -142,7 +142,7 @@ if __name__ == "__main__":
         # send broadcast through udp every one sec
         for x in range(10):
             sleep(1)
-            sock_udp.sendto(msg, ('172.99.255.255', UDP_DEST_PORT))
+            sock_udp.sendto(msg, ('172.1.255.255', UDP_DEST_PORT))
         kill_acc = True
         # add all names to list
         for s in sockets:
