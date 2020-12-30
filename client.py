@@ -1,16 +1,19 @@
 from socket import *
 import time
 import signal
-import sys, tty, termios
+import sys
+import tty
+import termios
 import struct
 
-RED   = "\033[1;31m"  
-BLUE  = "\033[1;34m"
-CYAN  = "\033[1;36m"
+RED = "\033[1;31m"
+BLUE = "\033[1;34m"
+CYAN = "\033[1;36m"
 GREEN = "\033[0;32m"
 RESET = "\033[0;0m"
-BOLD    = "\033[;1m"
+BOLD = "\033[;1m"
 REVERSE = "\033[;7m"
+
 
 def interrupted(signum, frame):
     raise Exception("timeout")
@@ -24,8 +27,9 @@ def getch():
         ch = sys.stdin.read(1)
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    print(ch) #just for ui needs...
+    print(ch)  # just for ui needs...
     return ch
+
 
 if __name__ == "__main__":
     sys.stdout.write(CYAN)
@@ -42,7 +46,7 @@ if __name__ == "__main__":
         try:
             # receive offer, blocking method
             offer, serverName = clientUdpSocket.recvfrom(1024)
-            cookie,mtype,pnum = struct.unpack('Ibh',offer)
+            cookie, mtype, pnum = struct.unpack('Ibh', offer)
             # message received, open tcp connection
             hostName = serverName[0]
             print('Received offer from,', hostName,
@@ -64,24 +68,28 @@ if __name__ == "__main__":
             clientTcpSocket.connect((hostName, pnum))  # handShake
             groupName = 'Hadorbanim\n'
             clientTcpSocket.send(groupName.encode())  # send group name
-            clientTcpSocket.settimeout(10) #set time out for bad servers
+            clientTcpSocket.settimeout(10)  # set time out for bad servers
             msgOfNames = clientTcpSocket.recv(1024)  # get names of all groups
             print(msgOfNames.decode())  # print the message
             t_end = time.time() + 10
+            sys.stdout.write(GREEN)
+            while time.time() < t_end:
+                try:
+                    signal.alarm(1)
+                    ch = getch()
+                    signal.alarm(0)
+                    clientTcpSocket.send(ch.encode())
+                except:
+                    continue
             try:
-                sys.stdout.write(GREEN)
-                while time.time() < t_end:
-                    try:
-                        signal.alarm(1)
-                        ch = getch()
-                        signal.alarm(0)
-                        clientTcpSocket.send(ch.encode())
-                    except:
-                        continue
+                sys.stdout.write(BLUE)
+                end_msg = clientTcpSocket.recv(2048)
+                print(end_msg.decode())
+            except:
+                sys.stdout.write(CYAN)
             finally:
                 clientTcpSocket.close()
             sys.stdout.write(CYAN)
             print("Server disconnected, listening for offer requests...")
         except:
             continue
-
