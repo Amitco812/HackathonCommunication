@@ -120,10 +120,7 @@ if __name__ == "__main__":
     server_ip = get_if_addr(NETWORK)  # gethostbyname(gethostname())
     SERVER_PORT = 2012
     UDP_DEST_PORT = 13117
-    BROADCAST = '255.255.255.255'
 
-    # 0xfeedbeef - magic cookie, 0x2 - type, port - 1300 -> 0x0514
-    msg_bytes = [0xfe, 0xed, 0xbe, 0xef, 0x02, 0x05, 0x14]
     # convert to byte array
     msg = struct.pack('Ibh', 0xfeedbeef, 2, SERVER_PORT)
     sock_udp = socket(AF_INET, SOCK_DGRAM)  # UDP
@@ -145,7 +142,7 @@ if __name__ == "__main__":
         # send broadcast through udp every one sec
         for x in range(10):
             sleep(1)
-            sock_udp.sendto(msg, (BROADCAST, UDP_DEST_PORT))
+            sock_udp.sendto(msg, ('<broadcast>', UDP_DEST_PORT))
         kill_acc = True
         # add all names to list
         for s in sockets:
