@@ -4,6 +4,8 @@ import threading
 import random
 import sys
 import struct
+from scapy.arch import get_if_addr
+
 
 RED = "\033[1;31m"
 BLUE = "\033[1;34m"
@@ -114,7 +116,7 @@ if __name__ == "__main__":
     c_map = {}  # {addr:numberOfHits}
     group1 = {}  # {addr:name}
     group2 = {}  # {addr:name}
-    server_ip = gethostbyname(gethostname())
+    server_ip = get_if_addr(NETWORK)  # gethostbyname(gethostname())
     SERVER_PORT = 2012
     UDP_DEST_PORT = 13117
     BROADCAST = '255.255.255.255'
@@ -128,7 +130,7 @@ if __name__ == "__main__":
     sock_udp.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
     sock_tcp = socket(AF_INET, SOCK_STREAM)
     sock_tcp.settimeout(1)
-    sock_tcp.bind(('', SERVER_PORT))
+    sock_tcp.bind((server_ip, SERVER_PORT))
     sock_tcp.listen(5)
     sys.stdout.write(CYAN)
     print('Server started, listening on IP address', server_ip)
