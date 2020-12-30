@@ -12,6 +12,7 @@ GREEN = "\033[0;32m"
 RESET = "\033[0;0m"
 BOLD = "\033[;1m"
 REVERSE = "\033[;7m"
+NETWORK = 'eth1'  # change to eth2 for testing!
 
 
 def clear_data(procs, sockets, c_map, group1, group2):
@@ -127,7 +128,7 @@ if __name__ == "__main__":
     sock_udp.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
     sock_tcp = socket(AF_INET, SOCK_STREAM)
     sock_tcp.settimeout(1)
-    sock_tcp.bind(('', SERVER_PORT))
+    sock_tcp.bind((NETWORK, SERVER_PORT))
     sock_tcp.listen(5)
     sys.stdout.write(CYAN)
     print('Server started, listening on IP address', server_ip)

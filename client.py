@@ -13,6 +13,7 @@ GREEN = "\033[0;32m"
 RESET = "\033[0;0m"
 BOLD = "\033[;1m"
 REVERSE = "\033[;7m"
+NETWORK = 'eth1'  # change to eth2 for testing!
 
 
 def interrupted(signum, frame):
@@ -37,7 +38,7 @@ if __name__ == "__main__":
     serverPort = 13117
     # open udp socket to listen to broadcasts
     clientUdpSocket = socket(AF_INET, SOCK_DGRAM)
-    clientUdpSocket.bind(('', serverPort))
+    clientUdpSocket.bind((NETWORK, serverPort))
     # initiate client socket
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
