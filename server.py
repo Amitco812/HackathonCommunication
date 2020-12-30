@@ -109,6 +109,7 @@ def start_game(sockets, procs):
         sock.send(encoded)
     for proc in procs.values():
         proc.start()
+    print("Game on! 10 secs..")
     sleep(10)
 
 
@@ -153,6 +154,7 @@ if __name__ == "__main__":
                 # if fails, skip client and remove his socket
                 msg = s.recv(1024)
             except:
+                print("Misbehaving user, no name sent")
                 sockets.remove(s)  # clear user socket
                 del procs[clientId]  # clear user process
                 continue            # go read from next user
@@ -170,6 +172,7 @@ if __name__ == "__main__":
             try:
                 s.send(end_msg.encode())
             except:
+                print("Client closed socket too eraly")
                 continue
         # clear all previous game data
         clear_data(procs, sockets, c_map, group1, group2)
