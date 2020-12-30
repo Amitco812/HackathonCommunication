@@ -33,7 +33,7 @@ def get_mvp(c_map, winning_group):
         if currVal > best:
             mvp = winning_group[hostName]
             best = currVal
-    msg = "Best Team Played:" + mvp + "\n" + \
+    return "Best Team Played:" + mvp + "\n" + \
         "Smashing" + str(best) + "times!\n"
 
 
@@ -59,6 +59,7 @@ def declare_winner(c_map, group1, group2):
         msg += get_mvp(c_map, group2)
     else:
         msg += "Its a draw! Thanks for participating!"
+    return msg
 
 
 def listen(sock_tcp, procs, sockets, c_map, kill_acc, kill_all):
