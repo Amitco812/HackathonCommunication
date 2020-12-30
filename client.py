@@ -13,7 +13,6 @@ GREEN = "\033[0;32m"
 RESET = "\033[0;0m"
 BOLD = "\033[;1m"
 REVERSE = "\033[;7m"
-NETWORK = 'eth1'  # change to eth2 for testing!
 
 
 def interrupted(signum, frame):
