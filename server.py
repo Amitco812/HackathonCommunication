@@ -33,8 +33,8 @@ def get_mvp(c_map, winning_group):
         if currVal > best:
             mvp = winning_group[hostName]
             best = currVal
-    return "Best Team Played:" + mvp + "\n" + \
-        "Smashing" + str(best) + "times!\n"
+    return "Best Team Played: " + mvp + "\n" + \
+        "Smashing " + str(best) + " times!\n"
 
 
 def declare_winner(c_map, group1, group2):
