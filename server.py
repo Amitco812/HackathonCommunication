@@ -142,7 +142,7 @@ if __name__ == "__main__":
         # send broadcast through udp every one sec
         for x in range(10):
             sleep(1)
-            sock_udp.sendto(msg, ('<broadcast>', UDP_DEST_PORT))
+            sock_udp.sendto(msg, ('172.99.255.255', UDP_DEST_PORT))
         kill_acc = True
         # add all names to list
         for s in sockets:
