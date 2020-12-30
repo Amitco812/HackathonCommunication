@@ -5,6 +5,7 @@ import sys
 import tty
 import termios
 import struct
+from scapy.arch import get_if_addr
 
 RED = "\033[1;31m"
 BLUE = "\033[1;34m"
@@ -13,6 +14,7 @@ GREEN = "\033[0;32m"
 RESET = "\033[0;0m"
 BOLD = "\033[;1m"
 REVERSE = "\033[;7m"
+NETWORK = 'eth1'
 
 
 def interrupted(signum, frame):
@@ -37,7 +39,7 @@ if __name__ == "__main__":
     serverPort = 13117
     # open udp socket to listen to broadcasts
     clientUdpSocket = socket(AF_INET, SOCK_DGRAM)
-    clientUdpSocket.bind(('', serverPort))
+    clientUdpSocket.bind((get_if_addr(NETWORK), serverPort))
     # initiate client socket
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
