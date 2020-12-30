@@ -72,6 +72,7 @@ def listen(sock_tcp, procs, sockets, c_map, kill_acc, kill_all):
                 sock, addr = sock_tcp.accept()
                 sock.settimeout(1)
                 clientId = addr[0] + str(addr[1])
+                print("client connected with id: ", clientId)
                 x = threading.Thread(
                     target=thread_job, args=(clientId, sock, c_map, kill_all))
                 procs[clientId] = x
