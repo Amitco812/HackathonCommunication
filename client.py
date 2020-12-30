@@ -38,7 +38,7 @@ if __name__ == "__main__":
     serverPort = 13117
     # open udp socket to listen to broadcasts
     clientUdpSocket = socket(AF_INET, SOCK_DGRAM)
-    clientUdpSocket.bind((NETWORK, serverPort))
+    clientUdpSocket.bind(('', serverPort))
     # initiate client socket
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
