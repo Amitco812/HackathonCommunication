@@ -48,8 +48,9 @@ def declare_winner(c_map, group1, group2):
     for hostName in group2:
         g2 += c_map[hostName]
     sys.stdout.write(GREEN)
-    msg = "Game over!\nGroup 1 typed in" + \
-        str(g1) + "characters.\nGroup 2 typed in" + str(g2) + "characters.\n"
+    msg = "Game over!\nGroup 1 typed in " + \
+        str(g1) + " characters.\nGroup 2 typed in " + \
+        str(g2) + " characters.\n"
     if g1 > g2:
         msg += "Group 1 wins!\nCongratulations to the winners:\n==\n"
         for n in group1.values():
