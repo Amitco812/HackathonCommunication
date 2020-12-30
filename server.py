@@ -128,7 +128,7 @@ if __name__ == "__main__":
     sock_udp.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
     sock_tcp = socket(AF_INET, SOCK_STREAM)
     sock_tcp.settimeout(1)
-    sock_tcp.bind((NETWORK, SERVER_PORT))
+    sock_tcp.bind(('172.1.0/24', SERVER_PORT))
     sock_tcp.listen(5)
     sys.stdout.write(CYAN)
     print('Server started, listening on IP address', server_ip)
