@@ -4,7 +4,6 @@ import threading
 import random
 import sys
 import struct
-from scapy.all import *
 
 RED = "\033[1;31m"
 BLUE = "\033[1;34m"
@@ -13,7 +12,7 @@ GREEN = "\033[0;32m"
 RESET = "\033[0;0m"
 BOLD = "\033[;1m"
 REVERSE = "\033[;7m"
-NETWORK = 'eth1'  # change to eth2 for testing!
+NETWORK = 'eth1'
 
 
 def clear_data(procs, sockets, c_map, group1, group2):
@@ -115,7 +114,7 @@ if __name__ == "__main__":
     c_map = {}  # {addr:numberOfHits}
     group1 = {}  # {addr:name}
     group2 = {}  # {addr:name}
-    server_ip = get_if_addr(NETWORK)
+    server_ip = gethostbyname(gethostname())
     SERVER_PORT = 2012
     UDP_DEST_PORT = 13117
     BROADCAST = '255.255.255.255'
@@ -129,7 +128,7 @@ if __name__ == "__main__":
     sock_udp.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
     sock_tcp = socket(AF_INET, SOCK_STREAM)
     sock_tcp.settimeout(1)
-    sock_tcp.bind((server_ip, SERVER_PORT))
+    sock_tcp.bind((NETWORK, SERVER_PORT))
     sock_tcp.listen(5)
     sys.stdout.write(CYAN)
     print('Server started, listening on IP address', server_ip)
