@@ -165,7 +165,10 @@ if __name__ == "__main__":
         end_msg = declare_winner(c_map, group1, group2)
         # send end of game msg
         for s in sockets:
-            s.send(end_msg.encode())
+            try:
+                s.send(end_msg.encode())
+            except:
+                continue
         # clear all previous game data
         clear_data(procs, sockets, c_map, group1, group2)
         sys.stdout.write(CYAN)
