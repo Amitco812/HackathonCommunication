@@ -40,6 +40,7 @@ if __name__ == "__main__":
     # open udp socket to listen to broadcasts
     clientUdpSocket = socket(AF_INET, SOCK_DGRAM)
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    clientUdpSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
     clientUdpSocket.bind((get_if_addr(NETWORK), serverPort))
     # initiate client socket
     clientUdpSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
