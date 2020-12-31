@@ -25,6 +25,8 @@ def interrupted(signum, frame):
     raise Exception("timeout")
 
 # retrieves one character from user, regardless of user input (doesn't require '\n')
+
+
 def getch():
     fd = sys.stdin.fileno()                 # file descriptor of STDIN
     old_settings = termios.tcgetattr(fd)
@@ -74,7 +76,8 @@ if __name__ == "__main__":
             clientTcpSocket.connect((hostName, pnum))  # handShake
             groupName = 'Hadorbanim\n'
             clientTcpSocket.send(groupName.encode())  # send group name
-            clientTcpSocket.settimeout(GAME_TIME)  # set time out for bad servers
+            # set time out for bad servers
+            clientTcpSocket.settimeout(GAME_TIME)
             msgOfNames = clientTcpSocket.recv(1024)  # get names of all groups
             print(msgOfNames.decode())  # print the message
             t_end = time.time() + GAME_TIME
@@ -90,13 +93,13 @@ if __name__ == "__main__":
                 except:
                     continue
             try:
-                sys.stdout.write(BLUE) # ANSI color
+                sys.stdout.write(BLUE)  # ANSI color
                 end_msg = clientTcpSocket.recv(2*BUFFER_SIZE)
                 print(end_msg.decode())
             except:
                 sys.stdout.write(CYAN)
             finally:
-                clientTcpSocket.close() # ALWAYS close TCP socket when done
+                clientTcpSocket.close()  # ALWAYS close TCP socket when done
             sys.stdout.write(CYAN)
             print("Server disconnected, listening for offer requests...")
         except:

@@ -23,7 +23,9 @@ BUFFER_SIZE = 1024
 SERVER_PORT = 2012
 UDP_DEST_PORT = 13117
 
-# clears all data structures 
+# clears all data structures
+
+
 def clear_data(procs, sockets, c_map, group1, group2):
     c_map.clear()
     for sock in sockets:
@@ -34,20 +36,24 @@ def clear_data(procs, sockets, c_map, group1, group2):
     sockets.clear()
 
 # a game statistic- computes most typing client
+
+
 def get_mvp(c_map, winning_group):
     sys.stdout.write(BOLD + BLUE)
     best = 0
     mvp = ""
     # finds best clicking client
     for hostName in winning_group:
-        currVal = c_map[hostName]  # current client's score  
+        currVal = c_map[hostName]  # current client's score
         if currVal > best:
             mvp = winning_group[hostName]
-            best = currVal         # saves best values of all iterations 
+            best = currVal         # saves best values of all iterations
     return "Best Team Played: " + mvp + "\n" + \
         "Smashing " + str(best) + " times!\n"
 
-# creates last game's relevant "game over" message 
+# creates last game's relevant "game over" message
+
+
 def generate_winner_message(c_map, group1, group2):
     g1 = 0
     g2 = 0
@@ -60,7 +66,7 @@ def generate_winner_message(c_map, group1, group2):
     msg = "Game over!\nGroup 1 typed in " + \
         str(g1) + " characters.\nGroup 2 typed in " + \
         str(g2) + " characters.\n"
-        # all last announcment scenarious (win\lose\draw)
+    # all last announcment scenarious (win\lose\draw)
     if g1 > g2:
         msg += "Group 1 wins!\nCongratulations to the winners:\n==\n"
         for n in group1.values():
@@ -76,39 +82,45 @@ def generate_winner_message(c_map, group1, group2):
     return msg
 
 # function of thread that accepts client connections over tcp
+
+
 def listen(sock_tcp, procs, sockets, c_map, kill_acc, kill_all):
     while True:
         # continue to run if thread is annonated alive
         if not kill_acc:
             try:
-                sock, addr = sock_tcp.accept() # recieve connection
-                sock.settimeout(1) # so thread can check if it needs to finish
+                sock, addr = sock_tcp.accept()  # recieve connection
+                sock.settimeout(1)  # so thread can check if it needs to finish
                 clientId = addr[0] + str(addr[1])
                 print("client connected with id: ", clientId)
                 x = threading.Thread(
                     target=thread_job, args=(clientId, sock, c_map, kill_all))
                 procs[clientId] = x
-                sockets.append(sock) # thread build
+                sockets.append(sock)  # thread build
                 c_map[clientId] = 0
             except:
                 continue
 
 # function of all threads that recieve own's client typing while game
 #  (every thread has one client connection)
+
+
 def thread_job(clientId, socket, c_map, kill_all):
     # continue to run if thread is annonated alive
     while not kill_all:
         try:
             msg = socket.recv(BUFFER_SIZE)
             length = len(msg)
-            if length == 0: # error- ignore message
+            if length == 0:  # error- ignore message
                 break
             c_map[clientId] = c_map[clientId] + len(msg)
         except:
             continue
 
 # starts the game.
-# provokes all connections to be run by their threads. 
+# provokes all connections to be run by their threads.
+
+
 def start_game(sockets, procs):
     # generates starting message with all participents names
     msg = 'Welcome to Keyboard Spamming Battle Royale.\n'
@@ -128,7 +140,7 @@ def start_game(sockets, procs):
         proc.start()
     print("Game on! 10 secs..")
     # main thread waits for the game to finish GAME_TIME seconds
-    sleep(GAME_TIME) 
+    sleep(GAME_TIME)
 
 
 if __name__ == "__main__":
@@ -138,7 +150,6 @@ if __name__ == "__main__":
     group1 = {}  # {addr:name}
     group2 = {}  # {addr:name}
     server_ip = get_if_addr(NETWORK)  # gethostbyname(gethostname())
-    
 
     # convert to byte array
     msg = struct.pack('Ibh', MAGIC_COOKIE, MESSAGE_TYPE, SERVER_PORT)
@@ -151,7 +162,7 @@ if __name__ == "__main__":
     sock_tcp.settimeout(1)
     sock_tcp.bind(('', SERVER_PORT))
     sock_tcp.listen()
-    sys.stdout.write(CYAN) # ANSI color change
+    sys.stdout.write(CYAN)  # ANSI color change
     print('Server started, listening on IP address', server_ip)
     while True:
         # accept connections for GAME_TIME secs in t_acc thread
@@ -160,7 +171,7 @@ if __name__ == "__main__":
         t_acc = threading.Thread(
             target=listen, args=(sock_tcp, procs, sockets, c_map, kill_acc, kill_all))
         t_acc.start()
-        # send broadcast through udp every one sec for PRE_GAME_WAIT_TIME secs 
+        # send broadcast through udp every one sec for PRE_GAME_WAIT_TIME secs
         for x in range(PRE_GAME_WAIT_TIME):
             sleep(1)
             sock_udp.sendto(msg, ('<broadcast>', UDP_DEST_PORT))
