@@ -153,7 +153,7 @@ if __name__ == "__main__":
     sock_tcp.listen()
     sys.stdout.write(CYAN) # ANSI color change
     print('Server started, listening on IP address', server_ip)
-    while 1:
+    while True:
         # accept connections for GAME_TIME secs in t_acc thread
         kill_acc = False
         kill_all = False
